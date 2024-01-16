@@ -3,11 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" /> <!-- <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> -->
-    <!-- <uses-permission -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> -->
     <!-- android:name="android.permission.WRITE_EXTERNAL_STORAGE" -->
     <!-- tools:ignore="ScopedStorage" /> -->
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
 
     <application
         android:name=".CameraXApplication"
