@@ -33,8 +33,10 @@ class HomePage : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_PHOTO_REQUEST_CODE && resultCode == RESULT_OK) {
-            val selectedImage: Uri? = data?.data
-            // Use the selected image URI here
+            val selectedImageUri: Uri? = data?.data
+            val intentOpenCameraWithImage = Intent(this, MainActivity::class.java)
+            intentOpenCameraWithImage.putExtra("SelectedImageUri", selectedImageUri.toString())
+            startActivity(intentOpenCameraWithImage)
         }
     }
 }
