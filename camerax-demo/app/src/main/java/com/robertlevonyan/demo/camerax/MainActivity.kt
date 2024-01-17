@@ -11,8 +11,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val imageUriString = intent.getStringExtra("SelectedImageUri")
-        val imageUri = Uri.parse(imageUriString)
-        val overlayImageView: ImageView = findViewById(R.id.imageOverlay)
+        if (imageUriString != null ){
+            val imageUri = Uri.parse(imageUriString)
+            val overlayImageView: ImageView = findViewById(R.id.imageOverlay)
         overlayImageView.setImageURI(imageUri)
+        }
     }
 }
