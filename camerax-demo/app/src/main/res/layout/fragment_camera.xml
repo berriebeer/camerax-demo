@@ -47,8 +47,8 @@
         android:scaleType="centerCrop"
         android:src="@drawable/ic_no_picture"
         app:layout_constraintBottom_toBottomOf="@id/btnTakePicture"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/btnTakePicture"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnTakePicture"
         app:layout_constraintTop_toTopOf="@id/btnTakePicture"
         tools:ignore="ContentDescription" />
 
@@ -61,8 +61,8 @@
         android:scaleType="centerInside"
         android:src="@drawable/ic_outline_camera_front"
         app:layout_constraintBottom_toBottomOf="@id/btnTakePicture"
-        app:layout_constraintEnd_toStartOf="@id/btnTakePicture"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btnTakePicture"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/btnTakePicture"
         tools:ignore="ContentDescription" />
 

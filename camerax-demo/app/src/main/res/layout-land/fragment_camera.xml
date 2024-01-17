@@ -42,19 +42,6 @@
         tools:ignore="ContentDescription" />
 
     <ImageButton
-        android:id="@+id/btnGallery"
-        android:layout_width="@dimen/button_size_small"
-        android:layout_height="@dimen/button_size_small"
-        android:background="@android:color/transparent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_no_picture"
-        app:layout_constraintBottom_toTopOf="@id/btnTakePicture"
-        app:layout_constraintEnd_toEndOf="@id/btnTakePicture"
-        app:layout_constraintStart_toStartOf="@id/btnTakePicture"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ContentDescription" />
-
-    <ImageButton
         android:id="@+id/btnSwitchCamera"
         android:layout_width="@dimen/button_size_small"
         android:layout_height="@dimen/button_size_small"
@@ -62,6 +49,19 @@
         android:padding="@dimen/half_margin"
         android:scaleType="centerInside"
         android:src="@drawable/ic_outline_camera_front"
+        app:layout_constraintBottom_toTopOf="@id/btnTakePicture"
+        app:layout_constraintEnd_toEndOf="@id/btnTakePicture"
+        app:layout_constraintStart_toStartOf="@id/btnTakePicture"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription" />
+
+    <ImageButton
+        android:id="@+id/btnGallery"
+        android:layout_width="@dimen/button_size_small"
+        android:layout_height="@dimen/button_size_small"
+        android:background="@android:color/transparent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_no_picture"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/btnTakePicture"
         app:layout_constraintStart_toStartOf="@id/btnTakePicture"
