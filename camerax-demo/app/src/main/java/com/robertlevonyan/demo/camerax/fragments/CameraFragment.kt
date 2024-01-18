@@ -111,6 +111,13 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         flashMode = prefs.getInt(KEY_FLASH, FLASH_MODE_OFF)
         hasGrid = prefs.getBoolean(KEY_GRID, false)
         hasHdr = prefs.getBoolean(KEY_HDR, false)
+
+        val imageUriString = activity?.intent?.getStringExtra("SelectedImageUri")
+        if (imageUriString != null) {
+            val imageUri = Uri.parse(imageUriString)
+            binding.viewImageOverlay.setImageURI(imageUri)
+        }
+
         initViews()
 
         displayManager.registerDisplayListener(displayListener, null)
