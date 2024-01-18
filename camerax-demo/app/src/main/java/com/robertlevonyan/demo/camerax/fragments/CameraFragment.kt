@@ -15,6 +15,7 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.view.GestureDetector
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.core.ImageCapture.*
@@ -30,6 +31,7 @@ import coil.load
 import coil.request.ErrorResult
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
+import com.google.android.material.slider.Slider
 import com.robertlevonyan.demo.camerax.R
 import com.robertlevonyan.demo.camerax.analyzer.LuminosityAnalyzer
 import com.robertlevonyan.demo.camerax.databinding.FragmentCameraBinding
@@ -46,6 +48,7 @@ import kotlin.math.min
 import kotlin.properties.Delegates
 
 class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_camera) {
+
     // An instance for display manager to get display change callbacks
     private val displayManager by lazy { requireContext().getSystemService(Context.DISPLAY_SERVICE) as DisplayManager }
 
@@ -116,6 +119,14 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         if (imageUriString != null) {
             val imageUri = Uri.parse(imageUriString)
             binding.viewImageOverlay.setImageURI(imageUri)
+        }
+        // Find the slider view and set up a listener to change the image alpha
+        val slider = view.findViewById<Slider>(R.id.sliderAlpha)
+        val imageView = view.findViewById<ImageView>(R.id.viewImageOverlay)
+
+        // Set a listener on the slider to change the ImageView's alpha value
+        slider.addOnChangeListener { _, value, _ ->
+            imageView.alpha = value
         }
 
         initViews()
