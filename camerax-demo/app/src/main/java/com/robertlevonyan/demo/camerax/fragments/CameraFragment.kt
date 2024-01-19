@@ -14,6 +14,7 @@ import android.provider.MediaStore
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.camera.core.*
@@ -88,6 +89,9 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
     // Selector showing is there any selected timer and it's value (3s or 10s)
     private var selectedTimer = CameraTimer.OFF
 
+    // Remembers what the current rotation of the ImageView viewImageOverlay, to be manipulated with the btnRotate
+    private var currentRotation = 0f
+
     /**
      * A display listener for orientation changes that do not trigger a configuration
      * change, for example if we choose to override config change in manifest or for 180-degree
@@ -114,6 +118,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         hasGrid = prefs.getBoolean(KEY_GRID, false)
         hasHdr = prefs.getBoolean(KEY_HDR, false)
 
+        // Makes sure tha the selected image is passed to the viewImageOverlay
         val imageUriString = activity?.intent?.getStringExtra("SelectedImageUri")
         if (imageUriString != null) {
             val imageUri = Uri.parse(imageUriString)
@@ -121,11 +126,30 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         }
         // Find the slider view and set up a listener to change the image alpha
         val slider = view.findViewById<Slider>(R.id.sliderAlpha)
+
+        // Find the imageView
         val imageView = view.findViewById<ImageView>(R.id.viewImageOverlay)
 
         // Set a listener on the slider to change the ImageView's alpha value
         slider.addOnChangeListener { _, value, _ ->
             imageView.alpha = value
+        }
+
+        // Find the button for Mirroring the viewImageOverlay and do it
+        val btnMirrorImage: ImageButton = view.findViewById(R.id.btnMirrorImage)
+        btnMirrorImage.setOnClickListener {
+            // Logic to mirror the image
+            val imageView: ImageView = view.findViewById(R.id.viewImageOverlay)
+            imageView.scaleX *= -1 // This is a simple way to flip the view as a mirror image
+        }
+        // Find the button for Rotating the viewImageOverlay and do it
+        val btnRotate: ImageButton = view.findViewById(R.id.btnRotate)
+        btnRotate.setOnClickListener {
+            // Increase the current rotation by 90 degrees (counter clockwise)
+            currentRotation -= 90
+            // Apply the rotation to the ImageView
+            val imageView: ImageView = view.findViewById(R.id.viewImageOverlay)
+            imageView.rotation = currentRotation
         }
 
         initViews()
