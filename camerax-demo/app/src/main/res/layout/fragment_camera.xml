@@ -37,12 +37,63 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/btnTakePicture"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="0dp" />
+
+    <ImageButton
+        android:id="@+id/btnMirrorImage"
+        android:layout_width="@dimen/button_size_small"
+        android:layout_height="@dimen/button_size_small"
+        android:padding="8dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_outline_camera_rear"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnRotate"
+        app:layout_constraintTop_toTopOf="@+id/viewImageOverlayManipulation"
+        android:scaleType="centerInside"
+        tools:ignore="ContentDescription" />
+
+    <ImageButton
+        android:id="@+id/btnRotate"
+        android:layout_width="@dimen/button_size_small"
+        android:layout_height="@dimen/button_size_small"
+        android:padding="8dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_share"
+        app:layout_constraintStart_toEndOf="@+id/btnMirrorImage"
+        app:layout_constraintTop_toTopOf="@id/btnMirrorImage"
+        app:layout_constraintEnd_toStartOf="@+id/btnPan"
+        tools:ignore="ContentDescription" />
+
+    <ImageButton
+        android:id="@+id/btnPan"
+        android:layout_width="@dimen/button_size_small"
+        android:layout_height="@dimen/button_size_small"
+        android:background="@android:color/transparent"
+        android:elevation="1dp"
+        android:padding="@dimen/half_margin"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_exposure"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btnRotate"
+        app:layout_constraintTop_toTopOf="@+id/btnRotate"
+        tools:ignore="ContentDescription" />
+
+    <View
+        android:id="@+id/viewImageOverlayManipulation"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        app:layout_constraintBottom_toBottomOf="@id/sliderAlpha"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/sliderAlpha" />
+
 
     <View
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:alpha="0.4"
+        android:alpha="0.65"
         android:background="@android:color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
