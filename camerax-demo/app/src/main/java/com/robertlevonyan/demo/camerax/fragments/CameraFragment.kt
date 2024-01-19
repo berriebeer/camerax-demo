@@ -13,7 +13,6 @@ import android.os.HandlerThread
 import android.provider.MediaStore
 import android.util.DisplayMetrics
 import android.util.Log
-import android.view.GestureDetector
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
@@ -159,18 +158,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
             btnExposure.setOnClickListener { flExposure.visibility = View.VISIBLE }
             flExposure.setOnClickListener { flExposure.visibility = View.GONE }
 
-            // This swipe gesture adds a fun gesture to switch between video and photo
-            val swipeGestures = SwipeGestureDetector().apply {
-                setSwipeCallback(right = {
-                    Navigation.findNavController(view).navigate(R.id.action_camera_to_video)
-                })
-            }
-            val gestureDetectorCompat = GestureDetector(requireContext(), swipeGestures)
-            viewFinder.setOnTouchListener { _, motionEvent ->
-                if (gestureDetectorCompat.onTouchEvent(motionEvent)) return@setOnTouchListener false
-                return@setOnTouchListener true
-            }
-        }
+    }
     }
 
     /**
