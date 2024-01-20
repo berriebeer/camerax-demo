@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.content.res.Configuration
+import android.graphics.BitmapFactory
 import android.hardware.display.DisplayManager
 import android.net.Uri
 import android.os.Build
@@ -15,7 +16,6 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
 import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.core.ImageCapture.*
@@ -32,6 +32,7 @@ import coil.request.ErrorResult
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.google.android.material.slider.Slider
+import com.ortiz.touchview.TouchImageView
 import com.robertlevonyan.demo.camerax.R
 import com.robertlevonyan.demo.camerax.analyzer.LuminosityAnalyzer
 import com.robertlevonyan.demo.camerax.databinding.FragmentCameraBinding
@@ -122,25 +123,30 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         val imageUriString = activity?.intent?.getStringExtra("SelectedImageUri")
         if (imageUriString != null) {
             val imageUri = Uri.parse(imageUriString)
-            binding.viewImageOverlay.setImageURI(imageUri)
+            // Convert URI to Bitmap
+            val imageStream = activity?.contentResolver?.openInputStream(imageUri)
+            val selectedImage = BitmapFactory.decodeStream(imageStream)
+
+            // Set the Bitmap to TouchImageView
+            binding.viewImageOverlay.setImageBitmap(selectedImage)
         }
         // Find the slider view and set up a listener to change the image alpha
         val slider = view.findViewById<Slider>(R.id.sliderAlpha)
 
         // Find the imageView
-        val imageView = view.findViewById<ImageView>(R.id.viewImageOverlay)
+        val touchImageView = view.findViewById<TouchImageView>(R.id.viewImageOverlay)
 
         // Set a listener on the slider to change the ImageView's alpha value
         slider.addOnChangeListener { _, value, _ ->
-            imageView.alpha = value
+            touchImageView.alpha = value
         }
 
         // Find the button for Mirroring the viewImageOverlay and do it
         val btnMirrorImage: ImageButton = view.findViewById(R.id.btnMirrorImage)
         btnMirrorImage.setOnClickListener {
             // Logic to mirror the image
-            val imageView: ImageView = view.findViewById(R.id.viewImageOverlay)
-            imageView.scaleX *= -1 // This is a simple way to flip the view as a mirror image
+            val touchImageView: TouchImageView = view.findViewById(R.id.viewImageOverlay)
+            touchImageView.scaleX *= -1 // This is a simple way to flip the view as a mirror image
         }
         // Find the button for Rotating the viewImageOverlay and do it
         val btnRotate: ImageButton = view.findViewById(R.id.btnRotate)
@@ -148,8 +154,8 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
             // Increase the current rotation by 90 degrees (counter clockwise)
             currentRotation -= 90
             // Apply the rotation to the ImageView
-            val imageView: ImageView = view.findViewById(R.id.viewImageOverlay)
-            imageView.rotation = currentRotation
+            val touchImageView: TouchImageView = view.findViewById(R.id.viewImageOverlay)
+            touchImageView.rotation = currentRotation
         }
 
         initViews()
