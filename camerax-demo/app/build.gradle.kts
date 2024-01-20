@@ -57,4 +57,6 @@ dependencies {
 
     implementation("io.coil-kt:coil:2.4.0")
     implementation("io.coil-kt:coil-video:2.4.0")
+
+    implementation("com.github.MikeOrtiz:TouchImageView:1.4.1")
 }
