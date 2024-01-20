@@ -129,6 +129,10 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
 
             // Set the Bitmap to TouchImageView
             binding.viewImageOverlay.setImageBitmap(selectedImage)
+
+            // Initialize the TouchImageView with automatic min zoom
+            binding.viewImageOverlay.minZoom = 0.1f
+
         }
         // Find the slider view and set up a listener to change the image alpha
         val slider = view.findViewById<Slider>(R.id.sliderAlpha)
