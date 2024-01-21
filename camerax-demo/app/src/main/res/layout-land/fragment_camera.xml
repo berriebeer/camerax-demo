@@ -40,7 +40,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/btnTakePicture"
         app:layout_constraintEnd_toStartOf="@+id/view"
-        app:layout_constraintStart_toEndOf="@+id/viewBg2"/>
+        app:layout_constraintStart_toEndOf="@+id/viewBg2"
+        app:labelBehavior="gone"/>
 
     <ImageButton
         android:id="@+id/btnMirrorImage"
@@ -73,11 +74,11 @@
         android:src="@drawable/ic_share"
         app:layout_constraintStart_toEndOf="@+id/btnMirrorImage"
         app:layout_constraintTop_toTopOf="@id/btnMirrorImage"
-        app:layout_constraintEnd_toStartOf="@+id/btnPan"
+        app:layout_constraintEnd_toStartOf="@+id/btnToggleOverlay"
         tools:ignore="ContentDescription" />
 
     <ImageButton
-        android:id="@+id/btnPan"
+        android:id="@+id/btnToggleOverlay"
         android:layout_width="@dimen/button_size_small"
         android:layout_height="@dimen/button_size_small"
         android:background="@android:color/transparent"

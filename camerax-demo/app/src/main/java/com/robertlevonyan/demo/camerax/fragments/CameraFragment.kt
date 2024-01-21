@@ -93,6 +93,9 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
     // Remembers what the current rotation of the ImageView viewImageOverlay, to be manipulated with the btnRotate
     private var currentRotation = 0f
 
+    // Variable to hold the current value of the Slider
+    private var sliderCurrentValue: Float = 0.5f // Default value or saved state
+
     /**
      * A display listener for orientation changes that do not trigger a configuration
      * change, for example if we choose to override config change in manifest or for 180-degree
@@ -143,6 +146,28 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         // Set a listener on the slider to change the ImageView's alpha value
         slider.addOnChangeListener { _, value, _ ->
             touchImageView.alpha = value
+            sliderCurrentValue = value //save the current value
+            Log.d("CameraFragment", "Current sliderCurrentValue: ${touchImageView.alpha}")
+        }
+
+        // Find the button for ToggleOverlay and do it
+        val btnToggleOverlay: ImageButton = view.findViewById(R.id.btnToggleOverlay)
+        btnToggleOverlay.setOnClickListener {
+            if (touchImageView.visibility == View.VISIBLE) {
+                // Save the current alpha value before making invisible
+                sliderCurrentValue = touchImageView.alpha
+                Log.d("CameraFragment", "Alpha before made invisible: $sliderCurrentValue")
+                touchImageView.visibility = View.INVISIBLE
+            } else {
+                // Restore the alpha value after making visible
+                Log.d("CameraFragment", "Alpha before making visible again: ${touchImageView.alpha}")
+                touchImageView.visibility = View.VISIBLE
+                Log.d("CameraFragment", "Alpha after making visible again: ${touchImageView.alpha}")
+                touchImageView.postDelayed({
+                    touchImageView.alpha = sliderCurrentValue
+                }, 350)
+                Log.d("CameraFragment", "Alpha after making visible again2: ${touchImageView.alpha}")
+            }
         }
 
         // Find the button for Mirroring the viewImageOverlay and do it
@@ -152,6 +177,8 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
             val touchImageView: TouchImageView = view.findViewById(R.id.viewImageOverlay)
             touchImageView.scaleX *= -1 // This is a simple way to flip the view as a mirror image
         }
+
+
         // Find the button for Rotating the viewImageOverlay and do it
         val btnRotate: ImageButton = view.findViewById(R.id.btnRotate)
         btnRotate.setOnClickListener {
