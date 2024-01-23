@@ -86,10 +86,24 @@
         android:padding="@dimen/half_margin"
         android:scaleType="centerInside"
         android:src="@drawable/ic_exposure"
+        app:layout_constraintStart_toEndOf="@+id/btnRotate"
+        app:layout_constraintEnd_toStartOf="@+id/btnZoom"
+        app:layout_constraintTop_toTopOf="@+id/btnRotate"
+        tools:ignore="ContentDescription" />
+
+    <ImageButton
+        android:id="@+id/btnZoom"
+        android:layout_width="@dimen/button_size_small"
+        android:layout_height="@dimen/button_size_small"
+        android:background="@android:color/transparent"
+        android:elevation="1dp"
+        android:padding="@dimen/half_margin"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_zoom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btnRotate"
-        app:layout_constraintTop_toTopOf="@+id/btnRotate"
+        app:layout_constraintStart_toEndOf="@+id/btnToggleOverlay"
+        app:layout_constraintTop_toTopOf="@+id/btnToggleOverlay"
         tools:ignore="ContentDescription" />
 
     <View

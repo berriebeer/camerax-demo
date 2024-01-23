@@ -122,6 +122,9 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         hasGrid = prefs.getBoolean(KEY_GRID, false)
         hasHdr = prefs.getBoolean(KEY_HDR, false)
 
+        /**
+         * Import imageOverlay
+         */
         // Makes sure tha the selected image is passed to the viewImageOverlay
         val imageUriString = activity?.intent?.getStringExtra("SelectedImageUri")
         if (imageUriString != null) {
@@ -137,11 +140,15 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
             binding.viewImageOverlay.minZoom = 0.1f
 
         }
-        // Find the slider view and set up a listener to change the image alpha
-        val slider = view.findViewById<Slider>(R.id.sliderAlpha)
 
         // Find the imageView
         val touchImageView = view.findViewById<TouchImageView>(R.id.viewImageOverlay)
+
+        /**
+         * Slider
+         */
+        // Find the slider view and set up a listener to change the image alpha
+        val slider = view.findViewById<Slider>(R.id.sliderAlpha)
 
         // Set a listener on the slider to change the ImageView's alpha value
         slider.addOnChangeListener { _, value, _ ->
@@ -150,6 +157,18 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
             Log.d("CameraFragment", "Current sliderCurrentValue: ${touchImageView.alpha}")
         }
 
+        /**
+         * Zoom
+         */
+        // Initialize your Zoom Toggle Button
+        val btnZoomToggle: ImageButton = view.findViewById(R.id.btnZoom)
+        // Set up the click listener for the Zoom Toggle Button
+        btnZoomToggle.setOnClickListener {
+        }
+
+        /**
+         * Hide image (and restore alpha)
+         */
         // Find the button for ToggleOverlay and do it
         val btnToggleOverlay: ImageButton = view.findViewById(R.id.btnToggleOverlay)
         btnToggleOverlay.setOnClickListener {
@@ -157,7 +176,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
                 // Save the current alpha value before making invisible
                 sliderCurrentValue = touchImageView.alpha
                 Log.d("CameraFragment", "Alpha before made invisible: $sliderCurrentValue")
-                touchImageView.visibility = View.INVISIBLE
+                touchImageView.visibility = View.GONE
             } else {
                 // Restore the alpha value after making visible
                 Log.d("CameraFragment", "Alpha before making visible again: ${touchImageView.alpha}")
@@ -170,6 +189,9 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
             }
         }
 
+        /**
+         * Mirror
+         */
         // Find the button for Mirroring the viewImageOverlay and do it
         val btnMirrorImage: ImageButton = view.findViewById(R.id.btnMirrorImage)
         btnMirrorImage.setOnClickListener {
@@ -178,7 +200,9 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
             touchImageView.scaleX *= -1 // This is a simple way to flip the view as a mirror image
         }
 
-
+        /**
+         * Rotate 90degree ccw
+         */
         // Find the button for Rotating the viewImageOverlay and do it
         val btnRotate: ImageButton = view.findViewById(R.id.btnRotate)
         btnRotate.setOnClickListener {
