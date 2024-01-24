@@ -14,6 +14,7 @@ import android.os.HandlerThread
 import android.provider.MediaStore
 import android.util.DisplayMetrics
 import android.util.Log
+import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.ImageButton
 import android.widget.Toast
@@ -96,6 +97,10 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
     // Variable to hold the current value of the Slider
     private var sliderCurrentValue: Float = 0.5f // Default value or saved state
 
+    // Declare CameraControl and CameraInfo as class variables in CameraFragment, used for zoom:
+    private lateinit var cameraControl: CameraControl
+    private lateinit var cameraInfo: CameraInfo
+
     /**
      * A display listener for orientation changes that do not trigger a configuration
      * change, for example if we choose to override config change in manifest or for 180-degree
@@ -122,10 +127,33 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         hasGrid = prefs.getBoolean(KEY_GRID, false)
         hasHdr = prefs.getBoolean(KEY_HDR, false)
 
+
+        /** Pinch to Zoom
+         */
+        val viewFinder = view.findViewById<PreviewView>(R.id.viewFinder)
+
+        super.onViewCreated(view, savedInstanceState)
+
+        val scaleGestureDetector = ScaleGestureDetector(requireContext(), object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            override fun onScale(detector: ScaleGestureDetector): Boolean {
+                // Calculate desired zoom ratio
+                val currentZoomRatio = cameraInfo.zoomState.value?.zoomRatio ?: 1F
+                val delta = detector.scaleFactor
+                cameraControl.setZoomRatio(currentZoomRatio * delta)
+                return true
+            }
+        })
+
+        // Attach the pinch gesture listener to the viewfinder
+        viewFinder.setOnTouchListener { _, event ->
+            scaleGestureDetector.onTouchEvent(event)
+            true
+        }
+
         /**
          * Import imageOverlay
          */
-        // Makes sure tha the selected image is passed to the viewImageOverlay
+        // Makes sure that the selected image is passed to the viewImageOverlay
         val imageUriString = activity?.intent?.getStringExtra("SelectedImageUri")
         if (imageUriString != null) {
             val imageUri = Uri.parse(imageUriString)
@@ -135,7 +163,6 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
 
             // Set the Bitmap to TouchImageView
             binding.viewImageOverlay.setImageBitmap(selectedImage)
-
             // Initialize the TouchImageView with automatic min zoom
             binding.viewImageOverlay.minZoom = 0.1f
 
@@ -420,9 +447,90 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
             ?: binding.btnGallery.setImageResource(R.drawable.ic_no_picture) // or the default placeholder
     }
 
+
+    /**
+     * New implementation of private fun startCamera()
+     * */
+
+    private fun startCamera() {
+        // This is the CameraX PreviewView where the camera will be rendered
+        val viewFinder = binding.viewFinder
+
+        // The display information
+        val metrics = DisplayMetrics().also { viewFinder.display.getRealMetrics(it) }
+        // The ratio for the output image and preview
+        val aspectRatio = aspectRatio(metrics.widthPixels, metrics.heightPixels)
+        // The display rotation
+        val rotation = viewFinder.display.rotation
+
+        // Retrieve a CameraProvider for the lifecycle of the application
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
+        cameraProviderFuture.addListener({
+            try {
+                // Camera provider is used to bind the lifecycle of cameras to the lifecycle owner
+                val localCameraProvider = cameraProviderFuture.get()
+
+                // Unbind all use cases before rebinding
+                localCameraProvider.unbindAll()
+
+                // Prepare the camera preview use case
+                preview = Preview.Builder()
+                    .setTargetAspectRatio(aspectRatio) // set the camera aspect ratio
+                    .setTargetRotation(rotation) // set the camera rotation
+                    .build()
+
+                // Prepare the image capture use case
+                imageCapture = ImageCapture.Builder()
+                    .setCaptureMode(CAPTURE_MODE_MAXIMIZE_QUALITY) // setting to have pictures with highest quality possible (may be slow)
+                    .setFlashMode(flashMode) // set capture flash
+                    .setTargetAspectRatio(aspectRatio) // set the capture aspect ratio
+                    .setTargetRotation(rotation) // set the capture rotation
+                    .build()
+
+                checkForHdrExtensionAvailability()
+
+                // Optionally, prepare the image analysis use case
+                imageAnalyzer = ImageAnalysis.Builder()
+                    .setTargetAspectRatio(aspectRatio) // set the analyzer aspect ratio
+                    .setTargetRotation(rotation) // set the analyzer rotation
+                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST) // in our analysis, we care about the latest image
+                    .build()
+                    .also {
+                        setLuminosityAnalyzer(it)
+                    }
+
+                // Bind the camera use cases to the lifecycle owner within the application's process
+                val camera = localCameraProvider.bindToLifecycle(
+                    this@CameraFragment,
+                    lensFacing, // This should be the variable you've defined earlier
+                    preview,
+                    imageCapture,
+                    imageAnalyzer
+                )
+
+                // Retrieve the CameraControl and CameraInfo instances
+                cameraControl = camera.cameraControl
+                cameraInfo = camera.cameraInfo
+
+                // Attach the camera preview use case to the PreviewView
+                preview?.setSurfaceProvider(viewFinder.surfaceProvider)
+
+                // If you have additional setup for HDR or other camera features, include it here
+
+            } catch (e: InterruptedException) {
+                Toast.makeText(requireContext(), "Error starting camera", Toast.LENGTH_SHORT).show()
+                return@addListener
+            } catch (e: ExecutionException) {
+                Toast.makeText(requireContext(), "Error starting camera", Toast.LENGTH_SHORT).show()
+                return@addListener
+            }
+        }, ContextCompat.getMainExecutor(requireContext()))
+    }
+
+
     /**
      * Unbinds all the lifecycles from CameraX, then creates new with new parameters
-     * */
+     *
     private fun startCamera() {
         // This is the CameraX PreviewView where the camera will be rendered
         val viewFinder = binding.viewFinder
@@ -446,8 +554,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
             // The display rotation
             val rotation = viewFinder.display.rotation
 
-            val localCameraProvider = cameraProvider
-                ?: throw IllegalStateException("Camera initialization failed.")
+            val localCameraProvider = cameraProvider ?: throw IllegalStateException("Camera initialization failed.")
 
             // The Configuration of camera preview
             preview = Preview.Builder()
@@ -475,10 +582,23 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
 
             // Unbind the use-cases before rebinding them
             localCameraProvider.unbindAll()
+
+            // To check with ChatGPT whether these can combined like this
+
+            // Bind use cases to camera
+            val camera = localCameraProvider.bindToLifecycle(
+                this@CameraFragment,
+                CameraSelector.DEFAULT_BACK_CAMERA, // or your custom selector
+                preview, imageCapture, imageAnalyzer
+            )
+            // Obtain CameraControl and CameraInfo for zoom functionality
+            cameraControl = camera.cameraControl
+            cameraInfo = camera.cameraInfo
             // Bind all use cases to the camera with lifecycle
             bindToLifecycle(localCameraProvider, viewFinder)
         }, ContextCompat.getMainExecutor(requireContext()))
     }
+    */
 
     private fun checkForHdrExtensionAvailability() {
         // Create a Vendor Extension for HDR
