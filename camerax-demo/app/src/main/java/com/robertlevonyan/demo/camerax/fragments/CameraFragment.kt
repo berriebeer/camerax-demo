@@ -120,6 +120,86 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         } ?: Unit
     }
 
+    private fun initializeTouchImageView(imageUri: String) {
+        // Convert the String URI to a Uri object
+        val imageUriParsed = Uri.parse(imageUri)
+        // Get the image stream and decode it into a Bitmap
+        val imageStream = activity?.contentResolver?.openInputStream(imageUriParsed)
+        val selectedImage = BitmapFactory.decodeStream(imageStream)
+        // Find the imageView from the view hierarchy
+        val touchImageView = view?.findViewById<TouchImageView>(R.id.viewImageOverlay)?.apply {
+            // Set the Bitmap to the TouchImageView
+            setImageBitmap(selectedImage)
+            minZoom = 0.1f
+        }
+
+        /**
+         * Slider
+         */
+        // Find the slider view and set up a listener to change the image alpha
+        val slider = view?.findViewById<Slider>(R.id.sliderAlpha)
+        // Set a listener on the slider to change the ImageView's alpha value
+        slider?.addOnChangeListener { _, value, _ ->
+            touchImageView?.alpha = value
+            sliderCurrentValue = value //save the current value
+            Log.d("CameraFragment", "Current sliderCurrentValue: ${touchImageView?.alpha}")
+        }
+
+        /**
+         * Zoom
+         */
+
+        /**
+         * Hide ImageOverlay (and restore alpha once toggled back on)
+         */
+        // Find the button for ToggleOverlay and do it
+        val btnToggleOverlay: ImageButton? = view?.findViewById(R.id.btnToggleOverlay)
+        btnToggleOverlay?.setOnClickListener {
+            touchImageView?.let { imageView ->
+                if (imageView.visibility == View.VISIBLE) {
+                    // Save the current alpha value before making invisible
+                    sliderCurrentValue = imageView.alpha
+                    Log.d("CameraFragment", "Alpha before made invisible: $sliderCurrentValue")
+                    imageView.visibility = View.GONE
+                } else {
+                    // Restore the alpha value after making visible
+                    Log.d("CameraFragment", "Alpha before making visible again: ${imageView.alpha}")
+                    imageView.visibility = View.VISIBLE
+                    // Post the action to the imageView's handler to avoid potential threading issues
+                    imageView.postDelayed({
+                        // Check again if imageView is visible to avoid potential issues if the view was hidden again.
+                        if(imageView.visibility == View.VISIBLE) {
+                            imageView.alpha = sliderCurrentValue
+                            Log.d("CameraFragment", "Alpha after making visible again2: ${imageView.alpha}")
+                        }
+                    }, 350)
+                }
+            }
+        }
+
+        /**
+         * Mirror
+         */
+        // Find the button for Mirroring the viewImageOverlay and do it
+        val btnMirrorImage: ImageButton? = view?.findViewById(R.id.btnMirrorImage)
+        btnMirrorImage?.setOnClickListener {
+            // Logic to mirror the image
+            touchImageView?.scaleX = (touchImageView?.scaleX ?: 1f) * -1
+        }
+
+        /**
+         * Rotate 90degree ccw
+         */
+        // Find the button for Rotating the viewImageOverlay and do it
+        val btnRotate: ImageButton? = view?.findViewById(R.id.btnRotate)
+        btnRotate?.setOnClickListener {
+            // Increase the current rotation by 90 degrees (counter clockwise)
+            currentRotation -= 90
+            // Apply the rotation to the ImageView
+            touchImageView?.rotation = currentRotation
+        }
+
+    }
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -127,6 +207,19 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         hasGrid = prefs.getBoolean(KEY_GRID, false)
         hasHdr = prefs.getBoolean(KEY_HDR, false)
 
+        // Check if an image URI is passed and initialize the TouchImageView if it is
+        val imageUriString = activity?.intent?.getStringExtra("SelectedImageUri")
+        if (!imageUriString.isNullOrEmpty()) {
+            initializeTouchImageView(imageUriString)
+        } else {
+            // If no image URI is passed, set the visibility of the related buttons to GONE
+            view.findViewById<TouchImageView>(R.id.viewImageOverlay).visibility = View.GONE
+            view.findViewById<ImageButton>(R.id.btnZoom).visibility = View.GONE
+            view.findViewById<ImageButton>(R.id.btnMirrorImage).visibility = View.GONE
+            view.findViewById<ImageButton>(R.id.btnRotate).visibility = View.GONE
+            view.findViewById<ImageButton>(R.id.btnToggleOverlay).visibility = View.GONE
+            view.findViewById<Slider>(R.id.sliderAlpha).visibility = View.GONE
+        }
 
         /** Pinch to Zoom
          */
@@ -136,6 +229,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
 
         val scaleGestureDetector = ScaleGestureDetector(requireContext(), object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
             override fun onScale(detector: ScaleGestureDetector): Boolean {
+                Log.d("CameraFragment", "Pinch to Zoom is triggered")
                 // Calculate desired zoom ratio
                 val currentZoomRatio = cameraInfo.zoomState.value?.zoomRatio ?: 1F
                 val delta = detector.scaleFactor
@@ -148,96 +242,6 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         viewFinder.setOnTouchListener { _, event ->
             scaleGestureDetector.onTouchEvent(event)
             true
-        }
-
-        /**
-         * Import imageOverlay
-         */
-        // Makes sure that the selected image is passed to the viewImageOverlay
-        val imageUriString = activity?.intent?.getStringExtra("SelectedImageUri")
-        if (imageUriString != null) {
-            val imageUri = Uri.parse(imageUriString)
-            // Convert URI to Bitmap
-            val imageStream = activity?.contentResolver?.openInputStream(imageUri)
-            val selectedImage = BitmapFactory.decodeStream(imageStream)
-
-            // Set the Bitmap to TouchImageView
-            binding.viewImageOverlay.setImageBitmap(selectedImage)
-            // Initialize the TouchImageView with automatic min zoom
-            binding.viewImageOverlay.minZoom = 0.1f
-
-        }
-
-        // Find the imageView
-        val touchImageView = view.findViewById<TouchImageView>(R.id.viewImageOverlay)
-
-        /**
-         * Slider
-         */
-        // Find the slider view and set up a listener to change the image alpha
-        val slider = view.findViewById<Slider>(R.id.sliderAlpha)
-
-        // Set a listener on the slider to change the ImageView's alpha value
-        slider.addOnChangeListener { _, value, _ ->
-            touchImageView.alpha = value
-            sliderCurrentValue = value //save the current value
-            Log.d("CameraFragment", "Current sliderCurrentValue: ${touchImageView.alpha}")
-        }
-
-        /**
-         * Zoom
-         */
-        // Initialize your Zoom Toggle Button
-        val btnZoomToggle: ImageButton = view.findViewById(R.id.btnZoom)
-        // Set up the click listener for the Zoom Toggle Button
-        btnZoomToggle.setOnClickListener {
-        }
-
-        /**
-         * Hide image (and restore alpha)
-         */
-        // Find the button for ToggleOverlay and do it
-        val btnToggleOverlay: ImageButton = view.findViewById(R.id.btnToggleOverlay)
-        btnToggleOverlay.setOnClickListener {
-            if (touchImageView.visibility == View.VISIBLE) {
-                // Save the current alpha value before making invisible
-                sliderCurrentValue = touchImageView.alpha
-                Log.d("CameraFragment", "Alpha before made invisible: $sliderCurrentValue")
-                touchImageView.visibility = View.GONE
-            } else {
-                // Restore the alpha value after making visible
-                Log.d("CameraFragment", "Alpha before making visible again: ${touchImageView.alpha}")
-                touchImageView.visibility = View.VISIBLE
-                Log.d("CameraFragment", "Alpha after making visible again: ${touchImageView.alpha}")
-                touchImageView.postDelayed({
-                    touchImageView.alpha = sliderCurrentValue
-                }, 350)
-                Log.d("CameraFragment", "Alpha after making visible again2: ${touchImageView.alpha}")
-            }
-        }
-
-        /**
-         * Mirror
-         */
-        // Find the button for Mirroring the viewImageOverlay and do it
-        val btnMirrorImage: ImageButton = view.findViewById(R.id.btnMirrorImage)
-        btnMirrorImage.setOnClickListener {
-            // Logic to mirror the image
-            val touchImageView: TouchImageView = view.findViewById(R.id.viewImageOverlay)
-            touchImageView.scaleX *= -1 // This is a simple way to flip the view as a mirror image
-        }
-
-        /**
-         * Rotate 90degree ccw
-         */
-        // Find the button for Rotating the viewImageOverlay and do it
-        val btnRotate: ImageButton = view.findViewById(R.id.btnRotate)
-        btnRotate.setOnClickListener {
-            // Increase the current rotation by 90 degrees (counter clockwise)
-            currentRotation -= 90
-            // Apply the rotation to the ImageView
-            val touchImageView: TouchImageView = view.findViewById(R.id.viewImageOverlay)
-            touchImageView.rotation = currentRotation
         }
 
         initViews()
@@ -337,6 +341,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
 
         startCamera()
     }
+
 
     /**
      * Navigate to PreviewFragment
@@ -526,79 +531,6 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
             }
         }, ContextCompat.getMainExecutor(requireContext()))
     }
-
-
-    /**
-     * Unbinds all the lifecycles from CameraX, then creates new with new parameters
-     *
-    private fun startCamera() {
-        // This is the CameraX PreviewView where the camera will be rendered
-        val viewFinder = binding.viewFinder
-
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
-        cameraProviderFuture.addListener({
-            try {
-                cameraProvider = cameraProviderFuture.get()
-            } catch (e: InterruptedException) {
-                Toast.makeText(requireContext(), "Error starting camera", Toast.LENGTH_SHORT).show()
-                return@addListener
-            } catch (e: ExecutionException) {
-                Toast.makeText(requireContext(), "Error starting camera", Toast.LENGTH_SHORT).show()
-                return@addListener
-            }
-
-            // The display information
-            val metrics = DisplayMetrics().also { viewFinder.display.getRealMetrics(it) }
-            // The ratio for the output image and preview
-            val aspectRatio = aspectRatio(metrics.widthPixels, metrics.heightPixels)
-            // The display rotation
-            val rotation = viewFinder.display.rotation
-
-            val localCameraProvider = cameraProvider ?: throw IllegalStateException("Camera initialization failed.")
-
-            // The Configuration of camera preview
-            preview = Preview.Builder()
-                .setTargetAspectRatio(aspectRatio) // set the camera aspect ratio
-                .setTargetRotation(rotation) // set the camera rotation
-                .build()
-
-            // The Configuration of image capture
-            imageCapture = Builder()
-                .setCaptureMode(CAPTURE_MODE_MAXIMIZE_QUALITY) // setting to have pictures with highest quality possible (may be slow)
-                .setFlashMode(flashMode) // set capture flash
-                .setTargetAspectRatio(aspectRatio) // set the capture aspect ratio
-                .setTargetRotation(rotation) // set the capture rotation
-                .build()
-
-            checkForHdrExtensionAvailability()
-
-            // The Configuration of image analyzing
-            imageAnalyzer = ImageAnalysis.Builder()
-                .setTargetAspectRatio(aspectRatio) // set the analyzer aspect ratio
-                .setTargetRotation(rotation) // set the analyzer rotation
-                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST) // in our analysis, we care about the latest image
-                .build()
-                .also { setLuminosityAnalyzer(it) }
-
-            // Unbind the use-cases before rebinding them
-            localCameraProvider.unbindAll()
-
-            // To check with ChatGPT whether these can combined like this
-
-            // Bind use cases to camera
-            val camera = localCameraProvider.bindToLifecycle(
-                this@CameraFragment,
-                CameraSelector.DEFAULT_BACK_CAMERA, // or your custom selector
-                preview, imageCapture, imageAnalyzer
-            )
-            // Obtain CameraControl and CameraInfo for zoom functionality
-            cameraControl = camera.cameraControl
-            cameraInfo = camera.cameraInfo
-            // Bind all use cases to the camera with lifecycle
-            bindToLifecycle(localCameraProvider, viewFinder)
-        }, ContextCompat.getMainExecutor(requireContext()))
-    }
-    */
 
     private fun checkForHdrExtensionAvailability() {
         // Create a Vendor Extension for HDR
