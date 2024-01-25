@@ -43,6 +43,27 @@
         app:layout_constraintStart_toEndOf="@+id/viewBg2"
         app:labelBehavior="gone"/>
 
+    <View
+        android:id="@+id/viewImageOverlayManipulation"
+        android:layout_width="0dp"
+        android:layout_height="36dp"
+        app:layout_constraintStart_toEndOf="@id/viewBg2"
+        app:layout_constraintEnd_toStartOf="@id/view"
+        app:layout_constraintBottom_toTopOf="@id/sliderAlpha" />
+
+    <ImageButton
+        android:id="@+id/btnSelectImage"
+        android:layout_width="@dimen/button_size_small"
+        android:layout_height="@dimen/button_size_small"
+        android:padding="8dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_select_image"
+        app:layout_constraintStart_toEndOf="@id/viewBg2"
+        app:layout_constraintEnd_toStartOf="@+id/btnMirrorImage"
+        app:layout_constraintTop_toTopOf="@+id/viewImageOverlayManipulation"
+        android:scaleType="centerInside"
+        tools:ignore="ContentDescription" />
+
     <ImageButton
         android:id="@+id/btnMirrorImage"
         android:layout_width="@dimen/button_size_small"
@@ -50,20 +71,11 @@
         android:padding="8dp"
         android:background="@android:color/transparent"
         android:src="@drawable/ic_outline_camera_rear"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btnSelectImage"
         app:layout_constraintEnd_toStartOf="@+id/btnRotate"
         app:layout_constraintTop_toTopOf="@+id/viewImageOverlayManipulation"
         android:scaleType="centerInside"
         tools:ignore="ContentDescription" />
-
-    <View
-        android:id="@+id/viewImageOverlayManipulation"
-        android:layout_width="match_parent"
-        android:layout_height="36dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/sliderAlpha" />
 
     <ImageButton
         android:id="@+id/btnRotate"
@@ -71,7 +83,7 @@
         android:layout_height="@dimen/button_size_small"
         android:padding="8dp"
         android:background="@android:color/transparent"
-        android:src="@drawable/ic_share"
+        android:src="@drawable/ic_rotate"
         app:layout_constraintStart_toEndOf="@+id/btnMirrorImage"
         app:layout_constraintTop_toTopOf="@id/btnMirrorImage"
         app:layout_constraintEnd_toStartOf="@+id/btnToggleOverlay"
@@ -87,20 +99,20 @@
         android:scaleType="centerInside"
         android:src="@drawable/ic_exposure"
         app:layout_constraintStart_toEndOf="@+id/btnRotate"
-        app:layout_constraintEnd_toStartOf="@+id/btnZoom"
+        app:layout_constraintEnd_toStartOf="@+id/btnLock"
         app:layout_constraintTop_toTopOf="@+id/btnRotate"
         tools:ignore="ContentDescription" />
 
     <ImageButton
-        android:id="@+id/btnZoom"
+        android:id="@+id/btnLock"
         android:layout_width="@dimen/button_size_small"
         android:layout_height="@dimen/button_size_small"
         android:background="@android:color/transparent"
         android:elevation="1dp"
         android:padding="@dimen/half_margin"
         android:scaleType="centerInside"
-        android:src="@drawable/ic_zoom"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@drawable/ic_lock"
+        app:layout_constraintEnd_toEndOf="@+id/viewImageOverlayManipulation"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btnToggleOverlay"
         app:layout_constraintTop_toTopOf="@+id/btnToggleOverlay"

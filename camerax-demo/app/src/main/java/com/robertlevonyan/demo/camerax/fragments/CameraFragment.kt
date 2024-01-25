@@ -101,6 +101,10 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
     private lateinit var cameraControl: CameraControl
     private lateinit var cameraInfo: CameraInfo
 
+    // Add a property to keep track of the lock state. Used for initializeLockButton/setTouchImageViewInteraction
+    private var isLocked = false
+
+
     /**
      * A display listener for orientation changes that do not trigger a configuration
      * change, for example if we choose to override config change in manifest or for 180-degree
@@ -214,12 +218,14 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         } else {
             // If no image URI is passed, set the visibility of the related buttons to GONE
             view.findViewById<TouchImageView>(R.id.viewImageOverlay).visibility = View.GONE
-            view.findViewById<ImageButton>(R.id.btnZoom).visibility = View.GONE
+            view.findViewById<ImageButton>(R.id.btnLock).visibility = View.GONE
             view.findViewById<ImageButton>(R.id.btnMirrorImage).visibility = View.GONE
             view.findViewById<ImageButton>(R.id.btnRotate).visibility = View.GONE
             view.findViewById<ImageButton>(R.id.btnToggleOverlay).visibility = View.GONE
             view.findViewById<Slider>(R.id.sliderAlpha).visibility = View.GONE
         }
+
+        initializeLockButton()
 
         /** Pinch to Zoom
          */
@@ -245,6 +251,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         }
 
         initViews()
+
 
         displayManager.registerDisplayListener(displayListener, null)
 
@@ -273,6 +280,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
             btnFlashAuto.setOnClickListener { closeFlashAndSelect(FLASH_MODE_AUTO) }
             btnExposure.setOnClickListener { flExposure.visibility = View.VISIBLE }
             flExposure.setOnClickListener { flExposure.visibility = View.GONE }
+
 
     }
     }
@@ -342,7 +350,32 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         startCamera()
     }
 
+//InitializeLockButton
+    private fun initializeLockButton() {
+        // Find the lock button and set up a click listener
+        val btnLock: ImageButton = binding.btnLock // Assuming you have a button with ID btnLock in your layout
+        btnLock.setOnClickListener {
+            // Toggle the lock state
+            isLocked = !isLocked
 
+            // Update the button appearance based on the lock state
+            btnLock.setImageResource(if (isLocked) R.drawable.ic_lock else R.drawable.ic_lock)
+
+            // Enable or disable the interaction with the ImageOverlay and other buttons
+            setTouchImageViewInteraction(!isLocked)
+        }
+    }
+
+    private fun setTouchImageViewInteraction(enabled: Boolean) {
+        // Enable or disable interactions with the ImageOverlay
+        binding.viewImageOverlay.isEnabled = enabled
+
+        // Enable or disable buttons and slider
+        binding.btnMirrorImage.isEnabled = enabled
+        binding.btnRotate.isEnabled = enabled
+        binding.btnToggleOverlay.isEnabled = enabled
+        binding.sliderAlpha.isEnabled = enabled
+    }
     /**
      * Navigate to PreviewFragment
      * */
@@ -452,9 +485,8 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
             ?: binding.btnGallery.setImageResource(R.drawable.ic_no_picture) // or the default placeholder
     }
 
-
     /**
-     * New implementation of private fun startCamera()
+     *startCamera()
      * */
 
     private fun startCamera() {
