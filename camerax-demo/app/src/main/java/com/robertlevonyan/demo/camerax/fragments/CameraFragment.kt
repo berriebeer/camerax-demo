@@ -4,7 +4,10 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.graphics.drawable.BitmapDrawable
 import android.hardware.display.DisplayManager
 import android.net.Uri
 import android.os.Build
@@ -161,7 +164,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         /**
          * Select Image
          */
-        val btnSelectImage: ImageButton = binding.btnSelectImage // Assuming you have this button in your layout
+        val btnSelectImage: ImageButton = binding.btnSelectImage
         btnSelectImage.setOnClickListener {
             imagePickerLauncher.launch("image/*")
         }
@@ -210,12 +213,24 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         // Find the button for Rotating the viewImageOverlay and do it
         val btnRotate: ImageButton? = view?.findViewById(R.id.btnRotate)
         btnRotate?.setOnClickListener {
-            // Increase the current rotation by 90 degrees (counter clockwise)
-            currentRotation -= 90
-            // Apply the rotation to the ImageView
-            touchImageView?.rotation = currentRotation
+            // Retrieve the bitmap from the TouchImageView
+            val bitmap = (touchImageView?.drawable as? BitmapDrawable)?.bitmap
+
+            // Rotate the bitmap
+            val rotatedBitmap = bitmap?.let { rotateBitmap(it, -90f) } // 90 degrees counter-clockwise
+
+            // Set the rotated bitmap back to the TouchImageView
+            touchImageView?.setImageBitmap(rotatedBitmap)
         }
 
+
+    }
+
+    // Place the rotateBitmap function here
+    private fun rotateBitmap(source: Bitmap, angle: Float): Bitmap {
+        val matrix = Matrix()
+        matrix.postRotate(angle)
+        return Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix, true)
     }
 
     private lateinit var imagePickerLauncher: ActivityResultLauncher<String>
