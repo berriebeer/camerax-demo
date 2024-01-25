@@ -18,6 +18,8 @@ import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.ImageButton
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.*
 import androidx.camera.core.ImageCapture.*
 import androidx.camera.extensions.ExtensionMode
@@ -132,6 +134,13 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         val selectedImage = BitmapFactory.decodeStream(imageStream)
         // Find the imageView from the view hierarchy
         val touchImageView = view?.findViewById<TouchImageView>(R.id.viewImageOverlay)?.apply {
+            // Reset the properties to default
+            setZoom(1.0f)
+            // Reset position to center the image
+            scaleX = 1f // Reset mirror
+            rotation = 0f // Reset rotation
+            alpha = 0.5f // Reset alpha to fully opaque
+
             // Set the Bitmap to the TouchImageView
             setImageBitmap(selectedImage)
             minZoom = 0.1f
@@ -150,8 +159,12 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         }
 
         /**
-         * Zoom
+         * Select Image
          */
+        val btnSelectImage: ImageButton = binding.btnSelectImage // Assuming you have this button in your layout
+        btnSelectImage.setOnClickListener {
+            imagePickerLauncher.launch("image/*")
+        }
 
         /**
          * Hide ImageOverlay (and restore alpha once toggled back on)
@@ -204,6 +217,9 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         }
 
     }
+
+    private lateinit var imagePickerLauncher: ActivityResultLauncher<String>
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -218,11 +234,20 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         } else {
             // If no image URI is passed, set the visibility of the related buttons to GONE
             view.findViewById<TouchImageView>(R.id.viewImageOverlay).visibility = View.GONE
+            view.findViewById<ImageButton>(R.id.btnSelectImage).visibility = View.GONE
             view.findViewById<ImageButton>(R.id.btnLock).visibility = View.GONE
             view.findViewById<ImageButton>(R.id.btnMirrorImage).visibility = View.GONE
             view.findViewById<ImageButton>(R.id.btnRotate).visibility = View.GONE
             view.findViewById<ImageButton>(R.id.btnToggleOverlay).visibility = View.GONE
             view.findViewById<Slider>(R.id.sliderAlpha).visibility = View.GONE
+        }
+
+        //Launcher for selecting image
+        imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                // Update the TouchImageView with the selected image
+                initializeTouchImageView(uri.toString())
+            }
         }
 
         initializeLockButton()
@@ -762,6 +787,8 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         const val KEY_FLASH = "sPrefFlashCamera"
         const val KEY_GRID = "sPrefGridCamera"
         const val KEY_HDR = "sPrefHDR"
+
+        private const val IMAGE_PICK_CODE = 1000
 
         private const val RATIO_4_3_VALUE = 4.0 / 3.0 // aspect ratio 4x3
         private const val RATIO_16_9_VALUE = 16.0 / 9.0 // aspect ratio 16x9
