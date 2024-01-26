@@ -7,4 +7,5 @@
     <color name="slider_track_color">#B3FFFFFF</color>
     <color name="slider_thumb_color">#FF757575</color>
     <color name="slider_halo_color">#FFBDBDBD</color>
+    <color name="button_disabled">#808080</color>
 </resources>

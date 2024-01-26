@@ -3,10 +3,14 @@ package com.robertlevonyan.demo.camerax.fragments
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
+import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.Matrix
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.BitmapDrawable
 import android.hardware.display.DisplayManager
 import android.net.Uri
@@ -249,6 +253,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         } else {
             // If no image URI is passed, set the visibility of the related buttons to GONE
             view.findViewById<TouchImageView>(R.id.viewImageOverlay).visibility = View.GONE
+            view.findViewById<View>(R.id.viewImageOverlayManipulation).visibility = View.GONE
             view.findViewById<ImageButton>(R.id.btnSelectImage).visibility = View.GONE
             view.findViewById<ImageButton>(R.id.btnLock).visibility = View.GONE
             view.findViewById<ImageButton>(R.id.btnMirrorImage).visibility = View.GONE
@@ -393,13 +398,13 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
 //InitializeLockButton
     private fun initializeLockButton() {
         // Find the lock button and set up a click listener
-        val btnLock: ImageButton = binding.btnLock // Assuming you have a button with ID btnLock in your layout
+        val btnLock: ImageButton = binding.btnLock
         btnLock.setOnClickListener {
             // Toggle the lock state
             isLocked = !isLocked
 
             // Update the button appearance based on the lock state
-            btnLock.setImageResource(if (isLocked) R.drawable.ic_lock else R.drawable.ic_lock)
+            btnLock.setImageResource(if (isLocked) R.drawable.ic_lock else R.drawable.ic_lock_open)
 
             // Enable or disable the interaction with the ImageOverlay and other buttons
             setTouchImageViewInteraction(!isLocked)
@@ -411,10 +416,38 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         binding.viewImageOverlay.isEnabled = enabled
 
         // Enable or disable buttons and slider
+        val disabledColor = if (!enabled) {
+            ContextCompat.getColor(requireContext(), R.color.button_disabled)
+        } else {
+            // Assuming the original color of your icons is white
+            Color.WHITE
+        }
+
+        // Define a higher contrast or more transparent color for disabled state
+        val color = if (!enabled) {
+            // Adjust the alpha for opacity, e.g., 0x80 for 50% transparency
+            Color.argb(0x80, Color.red(disabledColor), Color.green(disabledColor), Color.blue(disabledColor))
+        } else {
+            // No transparency for enabled state
+            disabledColor
+        }
+        // Apply the color filter for enabled/disabled state
         binding.btnMirrorImage.isEnabled = enabled
+        binding.btnMirrorImage.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
+
         binding.btnRotate.isEnabled = enabled
+        binding.btnRotate.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
+
         binding.btnToggleOverlay.isEnabled = enabled
+        binding.btnToggleOverlay.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
+
+        binding.btnSelectImage.isEnabled = enabled
+        binding.btnSelectImage.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
+
+        // Adjust thumb and track colors for the slider
         binding.sliderAlpha.isEnabled = enabled
+        binding.sliderAlpha.thumbTintList = ColorStateList.valueOf(color)
+        binding.sliderAlpha.trackTintList = ColorStateList.valueOf(color)
     }
     /**
      * Navigate to PreviewFragment

@@ -25,7 +25,7 @@
         android:layout_height="match_parent"
         android:alpha="0.50"
         android:scaleType="centerCrop"
-        android:contentDescription="OverlayImage" />
+        tools:ignore="ContentDescription" />
 
     <com.google.android.material.slider.Slider
         android:id="@+id/sliderAlpha"
@@ -34,34 +34,38 @@
         android:valueFrom="0.0"
         android:valueTo="1.0"
         android:value="0.5"
+        android:alpha="0.4"
+        android:background="@android:color/black"
         app:trackColor="@color/slider_track_color"
         app:thumbColor="@color/slider_thumb_color"
         app:haloColor="@color/slider_halo_color"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/btnTakePicture"
         app:layout_constraintEnd_toStartOf="@+id/view"
         app:layout_constraintStart_toEndOf="@+id/viewBg2"
+        app:layout_constraintBottom_toTopOf="@id/viewImageOverlayManipulation"
         app:labelBehavior="gone"/>
 
     <View
         android:id="@+id/viewImageOverlayManipulation"
         android:layout_width="0dp"
-        android:layout_height="36dp"
+        android:layout_height="48dp"
+        android:alpha="0.4"
+        android:background="@android:color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/viewBg2"
-        app:layout_constraintEnd_toStartOf="@id/view"
-        app:layout_constraintBottom_toTopOf="@id/sliderAlpha" />
+        app:layout_constraintEnd_toStartOf="@id/view"/>
 
     <ImageButton
         android:id="@+id/btnSelectImage"
-        android:layout_width="@dimen/button_size_small"
-        android:layout_height="@dimen/button_size_small"
-        android:padding="8dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:background="@android:color/transparent"
-        android:src="@drawable/ic_select_image"
-        app:layout_constraintStart_toEndOf="@id/viewBg2"
-        app:layout_constraintEnd_toStartOf="@+id/btnMirrorImage"
-        app:layout_constraintTop_toTopOf="@+id/viewImageOverlayManipulation"
+        android:padding="8dp"
         android:scaleType="centerInside"
+        android:src="@drawable/ic_select_image"
+        app:layout_constraintEnd_toStartOf="@+id/btnMirrorImage"
+        app:layout_constraintStart_toEndOf="@id/viewBg2"
+        app:layout_constraintBottom_toBottomOf="@+id/viewImageOverlayManipulation"
+        app:layout_constraintTop_toTopOf="@+id/viewImageOverlayManipulation"
         tools:ignore="ContentDescription" />
 
     <ImageButton
@@ -73,6 +77,7 @@
         android:src="@drawable/ic_outline_camera_rear"
         app:layout_constraintStart_toEndOf="@+id/btnSelectImage"
         app:layout_constraintEnd_toStartOf="@+id/btnRotate"
+        app:layout_constraintBottom_toBottomOf="@+id/viewImageOverlayManipulation"
         app:layout_constraintTop_toTopOf="@+id/viewImageOverlayManipulation"
         android:scaleType="centerInside"
         tools:ignore="ContentDescription" />
@@ -85,7 +90,8 @@
         android:background="@android:color/transparent"
         android:src="@drawable/ic_rotate"
         app:layout_constraintStart_toEndOf="@+id/btnMirrorImage"
-        app:layout_constraintTop_toTopOf="@id/btnMirrorImage"
+        app:layout_constraintBottom_toBottomOf="@+id/viewImageOverlayManipulation"
+        app:layout_constraintTop_toTopOf="@id/viewImageOverlayManipulation"
         app:layout_constraintEnd_toStartOf="@+id/btnToggleOverlay"
         tools:ignore="ContentDescription" />
 
@@ -100,7 +106,8 @@
         android:src="@drawable/ic_exposure"
         app:layout_constraintStart_toEndOf="@+id/btnRotate"
         app:layout_constraintEnd_toStartOf="@+id/btnLock"
-        app:layout_constraintTop_toTopOf="@+id/btnRotate"
+        app:layout_constraintBottom_toBottomOf="@+id/viewImageOverlayManipulation"
+        app:layout_constraintTop_toTopOf="@+id/viewImageOverlayManipulation"
         tools:ignore="ContentDescription" />
 
     <ImageButton
@@ -111,11 +118,12 @@
         android:elevation="1dp"
         android:padding="@dimen/half_margin"
         android:scaleType="centerInside"
-        android:src="@drawable/ic_lock"
+        android:src="@drawable/ic_lock_open"
         app:layout_constraintEnd_toEndOf="@+id/viewImageOverlayManipulation"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btnToggleOverlay"
-        app:layout_constraintTop_toTopOf="@+id/btnToggleOverlay"
+        app:layout_constraintBottom_toBottomOf="@+id/viewImageOverlayManipulation"
+        app:layout_constraintTop_toTopOf="@+id/viewImageOverlayManipulation"
         tools:ignore="ContentDescription" />
 
     <View
@@ -134,7 +142,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:padding="@dimen/double_margin"
+        android:padding="24dp"
         android:src="@drawable/ic_take_picture"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -204,7 +212,7 @@
         android:scaleType="centerInside"
         android:src="@drawable/ic_grid_off"
         app:layout_constraintBottom_toTopOf="@+id/btnFlash"
-        app:layout_constraintStart_toStartOf="@id/btnTimer"
+        app:layout_constraintStart_toStartOf="@+id/btnTimer"
         app:layout_constraintTop_toBottomOf="@+id/btnTimer"
         tools:ignore="ContentDescription" />
 
@@ -218,7 +226,7 @@
         android:scaleType="centerInside"
         android:src="@drawable/ic_flash_off"
         app:layout_constraintBottom_toTopOf="@+id/btnHdr"
-        app:layout_constraintStart_toStartOf="@id/btnGrid"
+        app:layout_constraintStart_toStartOf="@+id/btnGrid"
         app:layout_constraintTop_toBottomOf="@+id/btnGrid"
         tools:ignore="ContentDescription" />
 
@@ -231,8 +239,8 @@
         android:padding="@dimen/half_margin"
         android:scaleType="centerInside"
         android:src="@drawable/ic_hdr_off"
-        app:layout_constraintBottom_toTopOf="@id/btnExposure"
-        app:layout_constraintStart_toStartOf="@id/btnFlash"
+        app:layout_constraintBottom_toTopOf="@+id/btnExposure"
+        app:layout_constraintStart_toStartOf="@+id/btnFlash"
         app:layout_constraintTop_toBottomOf="@+id/btnFlash"
         tools:ignore="ContentDescription" />
 
@@ -245,10 +253,68 @@
         android:padding="@dimen/half_margin"
         android:scaleType="centerInside"
         android:src="@drawable/ic_exposure"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@id/btnFlash"
+        app:layout_constraintBottom_toTopOf="@id/btnAspectRatio"
+        app:layout_constraintStart_toStartOf="@+id/btnFlash"
         app:layout_constraintTop_toBottomOf="@+id/btnHdr"
         tools:ignore="ContentDescription" />
+
+    <ImageButton
+        android:id="@+id/btnAspectRatio"
+        android:layout_width="@dimen/button_size_small"
+        android:layout_height="@dimen/button_size_small"
+        android:background="@android:color/transparent"
+        android:elevation="1dp"
+        android:padding="@dimen/half_margin"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_aspect_ratio"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/btnFlash"
+        app:layout_constraintTop_toBottomOf="@+id/btnExposure"
+        tools:ignore="ContentDescription" />
+
+    <LinearLayout
+        android:id="@+id/AllAspectRatioOptions"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:background="@android:color/black"
+        android:elevation="3dp"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/fab_margin"
+        android:paddingTop="@dimen/double_margin"
+        android:paddingEnd="@dimen/fab_margin"
+        android:paddingBottom="@dimen/fab_margin"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnAR1_1"
+            android:layout_width="@dimen/button_size_small"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_1_1"
+            tools:ignore="ContentDescription" />
+
+        <ImageButton
+            android:id="@+id/btnAR16_9"
+            android:layout_width="@dimen/button_size_small"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_16_9"
+            tools:ignore="ContentDescription" />
+
+        <ImageButton
+            android:id="@+id/btnAR4_3"
+            android:layout_width="@dimen/button_size_small"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_4_3"
+            tools:ignore="ContentDescription" />
+    </LinearLayout>
 
     <View
         android:id="@+id/gridVertical1"
