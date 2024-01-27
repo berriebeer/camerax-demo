@@ -36,5 +36,16 @@ class HomePage : AppCompatActivity() {
             // Use the launcher to start the activity for result
             imagePickerLauncher.launch("image/*")
         }
+
+        // Find the button and set the click listener
+        val buttonOpenPictures: Button = findViewById(R.id.btnOpenPictures)
+        buttonOpenPictures.setOnClickListener {
+            openPictures()
+        }
+
     }
-}
+        private fun openPictures() {
+            val intent = Intent(this, GalleryActivity::class.java)
+            startActivity(intent)
+        }
+    }

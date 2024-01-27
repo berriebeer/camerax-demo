@@ -37,6 +37,10 @@
             android:theme="@style/AppTheme.NoActionBar">
             <!-- No intent-filter here means this is not the entry point -->
         </activity>
+        <activity
+            android:name=".GalleryActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"

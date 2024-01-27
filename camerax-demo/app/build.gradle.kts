@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     kotlin("android")
-//    kotlin("kapt")
+    kotlin("kapt")
     id("androidx.navigation.safeargs")
 }
 
@@ -59,4 +59,7 @@ dependencies {
     implementation("io.coil-kt:coil-video:2.4.0")
 
     implementation("com.github.MikeOrtiz:TouchImageView:1.4.1")
+
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 }
