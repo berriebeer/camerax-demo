@@ -2,6 +2,7 @@ package com.robertlevonyan.demo.camerax
 
 import android.content.ContentUris
 import android.content.Context
+import android.content.Intent
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Build
@@ -31,7 +32,10 @@ class GalleryActivity : AppCompatActivity() {
         recyclerView.addItemDecoration(SpacesItemDecoration(resources.getDimensionPixelSize(R.dimen.image_spacing), 3))
 
         val imageUris = getAllImageUris(this)
-        imageAdapter = ImageAdapter(imageUris, this)
+        imageAdapter = ImageAdapter(imageUris, this) { uri ->
+            openImageDetailActivity(uri)
+        }
+
         recyclerView.adapter = imageAdapter
     }
 
@@ -69,7 +73,18 @@ class GalleryActivity : AppCompatActivity() {
         return imageUris
     }
 
-    class ImageAdapter(private val images: List<Uri>, private val context: Context) : RecyclerView.Adapter<ImageAdapter.ViewHolder>() {
+    private fun openImageDetailActivity(imageUri: Uri) {
+        val intent = Intent(this, ImageDetailActivity::class.java).apply {
+            putExtra("IMAGE_URI", imageUri.toString())
+        }
+        startActivity(intent)
+    }
+
+    class ImageAdapter(
+        private val images: List<Uri>,
+        private val context: Context,
+        private val onImageClick: (Uri) -> Unit
+    ) : RecyclerView.Adapter<ImageAdapter.ViewHolder>() {
         private val space = context.resources.getDimensionPixelSize(R.dimen.image_spacing) // Assuming you have defined this in dimens.xml
         private val imageWidth = (context.resources.displayMetrics.widthPixels / 3) - (2 * space)
 
@@ -84,16 +99,17 @@ class GalleryActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val uri = images[position]
-            Glide.with(context)
-                .load(uri)
-                .centerCrop()
-                .into(holder.imageView)
+            Glide.with(context).load(uri).into(holder.imageView)
+            holder.imageView.setOnClickListener {
+                onImageClick(uri)
+            }
         }
 
         override fun getItemCount(): Int {
             return images.size
         }
     }
+
     class SpacesItemDecoration(private val space: Int, private val spanCount: Int) : RecyclerView.ItemDecoration() {
         override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
             val position = parent.getChildAdapterPosition(view) // item position
@@ -110,8 +126,6 @@ class GalleryActivity : AppCompatActivity() {
             }
         }
     }
-
-
 }
 
 
