@@ -35,10 +35,10 @@ class GalleryActivity : AppCompatActivity() {
         recyclerView.addItemDecoration(SpacesItemDecoration(resources.getDimensionPixelSize(R.dimen.image_spacing), 3))
 
         val imageUris = getAllImageUris(this) as ArrayList<Uri>
+        imageUris.reverse() //From newest to oldest. If I don't do this, it's from old to new
         imageAdapter = ImageAdapter(imageUris, this) { position ->
             openImageDetailActivity(imageUris, position)
         }
-
         recyclerView.adapter = imageAdapter
     }
 
