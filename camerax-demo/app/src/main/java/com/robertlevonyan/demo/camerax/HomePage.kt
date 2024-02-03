@@ -3,10 +3,10 @@ package com.robertlevonyan.demo.camerax
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Button
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 
 class HomePage : AppCompatActivity() {
 
@@ -25,15 +25,15 @@ class HomePage : AppCompatActivity() {
             }
         }
 
-        val buttonGallery: Button = findViewById(R.id.btnOpenGallery)
-        buttonGallery.setOnClickListener {
+        val cardViewGallery: CardView = findViewById(R.id.cardViewRecreatePicture)
+        cardViewGallery.setOnClickListener {
             // Use the launcher to start the activity for result
             imagePickerLauncher.launch("image/*")
         }
 
         // Find the button and set the click listener
-        val buttonOpenPictures: Button = findViewById(R.id.btnOpenPictures)
-        buttonOpenPictures.setOnClickListener {
+        val cardViewOpenPictures: CardView = findViewById(R.id.cardViewOpenPictures)
+        cardViewOpenPictures.setOnClickListener {
             openPictures()
         }
 
