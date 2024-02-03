@@ -6,17 +6,6 @@
         android:background="#000000">
 
     <Button
-        android:id="@+id/btnOpenCamera"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="24dp"
-        android:text="@string/open_camera"
-        app:layout_constraintBottom_toTopOf="@id/btnOpenGallery"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
         android:id="@+id/btnOpenGallery"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -25,7 +14,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toTopOf="@id/btnOpenPictures"
-        app:layout_constraintTop_toBottomOf="@id/btnOpenCamera" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/btnOpenPictures"

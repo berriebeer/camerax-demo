@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,19 +22,21 @@ import java.io.File
 
 class GalleryActivity : AppCompatActivity() {
     private lateinit var imageAdapter: ImageAdapter
+    private lateinit var imageUris: List<Uri>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gallery)
+
 
         val recyclerView = findViewById<RecyclerView>(R.id.galleryRecyclerView)
         recyclerView.layoutManager = GridLayoutManager(this, 3)
         recyclerView.setHasFixedSize(true) // to improve performance
         recyclerView.addItemDecoration(SpacesItemDecoration(resources.getDimensionPixelSize(R.dimen.image_spacing), 3))
 
-        val imageUris = getAllImageUris(this)
-        imageAdapter = ImageAdapter(imageUris, this) { uri ->
-            openImageDetailActivity(uri)
+        val imageUris = getAllImageUris(this) as ArrayList<Uri>
+        imageAdapter = ImageAdapter(imageUris, this) { position ->
+            openImageDetailActivity(imageUris, position)
         }
 
         recyclerView.adapter = imageAdapter
@@ -70,20 +73,22 @@ class GalleryActivity : AppCompatActivity() {
                 }
             }
         }
+        Log.d("GalleryActivity", "Loaded URIs: $imageUris")
         return imageUris
     }
 
-    private fun openImageDetailActivity(imageUri: Uri) {
+    private fun openImageDetailActivity(imageUris: ArrayList<Uri>, currentPosition: Int) {
         val intent = Intent(this, ImageDetailActivity::class.java).apply {
-            putExtra("IMAGE_URI", imageUri.toString())
+            putParcelableArrayListExtra("IMAGE_URIS", imageUris)
+            putExtra("CURRENT_POSITION", currentPosition)
         }
         startActivity(intent)
     }
 
     class ImageAdapter(
-        private val images: List<Uri>,
+        private val images: ArrayList<Uri>,
         private val context: Context,
-        private val onImageClick: (Uri) -> Unit
+        private val onImageClick: (Int) -> Unit
     ) : RecyclerView.Adapter<ImageAdapter.ViewHolder>() {
         private val space = context.resources.getDimensionPixelSize(R.dimen.image_spacing) // Assuming you have defined this in dimens.xml
         private val imageWidth = (context.resources.displayMetrics.widthPixels / 3) - (2 * space)
@@ -101,7 +106,7 @@ class GalleryActivity : AppCompatActivity() {
             val uri = images[position]
             Glide.with(context).load(uri).into(holder.imageView)
             holder.imageView.setOnClickListener {
-                onImageClick(uri)
+                onImageClick(position)
             }
         }
 

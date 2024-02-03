@@ -25,12 +25,6 @@ class HomePage : AppCompatActivity() {
             }
         }
 
-        val buttonCamera: Button = findViewById(R.id.btnOpenCamera)
-        buttonCamera.setOnClickListener {
-            val intentCamera = Intent(this, MainActivity::class.java)
-            startActivity(intentCamera)
-        }
-
         val buttonGallery: Button = findViewById(R.id.btnOpenGallery)
         buttonGallery.setOnClickListener {
             // Use the launcher to start the activity for result
