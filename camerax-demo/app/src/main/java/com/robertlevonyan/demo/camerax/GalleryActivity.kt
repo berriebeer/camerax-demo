@@ -113,6 +113,12 @@ class GalleryActivity : AppCompatActivity() {
         override fun getItemCount(): Int {
             return images.size
         }
+        fun updateData(newImages: List<Uri>) {
+            images.clear()
+            images.addAll(newImages)
+            notifyDataSetChanged()
+        }
+
     }
 
     class SpacesItemDecoration(private val space: Int, private val spanCount: Int) : RecyclerView.ItemDecoration() {
@@ -131,6 +137,16 @@ class GalleryActivity : AppCompatActivity() {
             }
         }
     }
+    override fun onResume() {
+        super.onResume()
+        // Fetch new image URIs
+        val newImageUris = getAllImageUris(this) as ArrayList<Uri>
+        // Ensure the list is in the correct order (newest first)
+        newImageUris.reverse()
+        // Update the adapter with the new list
+        imageAdapter.updateData(newImageUris)
+    }
+
 }
 
 
