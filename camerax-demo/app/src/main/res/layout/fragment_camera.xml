@@ -49,7 +49,7 @@
     <View
         android:id="@+id/viewImageOverlayManipulation"
         android:layout_width="match_parent"
-        android:layout_height="36dp"
+        android:layout_height="32dp"
         android:alpha="0.4"
         android:background="@android:color/black"
         app:layout_constraintEnd_toEndOf="parent"
@@ -143,7 +143,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:padding="24dp"
+        android:padding="16dp"
         android:src="@drawable/ic_take_picture"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -258,70 +258,11 @@
         android:padding="@dimen/half_margin"
         android:scaleType="centerInside"
         android:src="@drawable/ic_exposure"
-        app:layout_constraintEnd_toStartOf="@id/btnAspectRatio"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btnHdr"
         app:layout_constraintTop_toTopOf="@id/btnFlash"
-        tools:ignore="ContentDescription" />
-
-    <ImageButton
-        android:id="@+id/btnAspectRatio"
-        android:layout_width="@dimen/button_size_small"
-        android:layout_height="@dimen/button_size_small"
-        android:background="@android:color/transparent"
-        android:elevation="1dp"
-        android:padding="@dimen/half_margin"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_aspect_ratio"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btnExposure"
-        app:layout_constraintTop_toTopOf="@id/btnFlash"
         tools:ignore="ContentDescription" />
-
-    <LinearLayout
-        android:id="@+id/AllAspectRatioOptions"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@android:color/black"
-        android:elevation="3dp"
-        android:orientation="horizontal"
-        android:paddingStart="@dimen/fab_margin"
-        android:paddingTop="@dimen/double_margin"
-        android:paddingEnd="@dimen/fab_margin"
-        android:paddingBottom="@dimen/fab_margin"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageButton
-            android:id="@+id/btnAR1_1"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/button_size_small"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_1_1"
-            tools:ignore="ContentDescription" />
-
-        <ImageButton
-            android:id="@+id/btnAR16_9"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/button_size_small"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_16_9"
-            tools:ignore="ContentDescription" />
-
-        <ImageButton
-            android:id="@+id/btnAR4_3"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/button_size_small"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_4_3"
-            tools:ignore="ContentDescription" />
-    </LinearLayout>
 
     <View
         android:id="@+id/gridVertical1"

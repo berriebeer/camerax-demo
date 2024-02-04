@@ -3,6 +3,7 @@ package com.robertlevonyan.demo.camerax.fragments
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Bitmap
@@ -36,13 +37,13 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.Navigation
 import coil.load
 import coil.request.ErrorResult
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.google.android.material.slider.Slider
 import com.ortiz.touchview.TouchImageView
+import com.robertlevonyan.demo.camerax.GalleryActivity
 import com.robertlevonyan.demo.camerax.R
 import com.robertlevonyan.demo.camerax.analyzer.LuminosityAnalyzer
 import com.robertlevonyan.demo.camerax.databinding.FragmentCameraBinding
@@ -239,6 +240,9 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
 
     private lateinit var imagePickerLauncher: ActivityResultLauncher<String>
 
+    private var lastImageUri: Uri? = null
+
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -311,7 +315,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
             })
 
             btnTakePicture.setOnClickListener { takePicture() }
-            btnGallery.setOnClickListener { openPreview() }
+            btnGallery.setOnClickListener { openGallery() }
             btnSwitchCamera.setOnClickListener { toggleCamera() }
             btnTimer.setOnClickListener { selectTimer() }
             btnGrid.setOnClickListener { toggleGrid() }
@@ -452,9 +456,11 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
     /**
      * Navigate to PreviewFragment
      * */
-    private fun openPreview() {
+    private fun openGallery() {
         if (getMedia().isEmpty()) return
-        view?.let { Navigation.findNavController(it).navigate(R.id.action_camera_to_preview) }
+        // Starting GalleryActivity
+        val intent = Intent(context, GalleryActivity::class.java)
+        startActivity(intent)
     }
 
     /**
@@ -553,9 +559,13 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
     }
 
     private fun setLastPictureThumbnail() = binding.btnGallery.post {
-        getMedia().firstOrNull() // check if there are any photos or videos in the app directory
-            ?.let { setGalleryThumbnail(it.uri) } // preview the last one
-            ?: binding.btnGallery.setImageResource(R.drawable.ic_no_picture) // or the default placeholder
+        getMedia().firstOrNull()?.let {
+            lastImageUri = it.uri
+            setGalleryThumbnail(it.uri)
+        } ?: run {
+            binding.btnGallery.setImageResource(R.drawable.ic_no_picture)
+            lastImageUri = null
+        }
     }
 
     /**
