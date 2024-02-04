@@ -10,18 +10,5 @@
         android:name="com.robertlevonyan.demo.camerax.fragments.CameraFragment"
         android:label="fragment_camera"
         tools:layout="@layout/fragment_camera" >
-        <action
-            android:id="@+id/action_camera_to_preview"
-            app:destination="@id/previewFragment"
-            app:enterAnim="@anim/slide_in"
-            app:exitAnim="@anim/slide_out"
-            app:popEnterAnim="@anim/slide_in_pop"
-            app:popExitAnim="@anim/slide_out_pop"
-            app:popUpTo="@+id/cameraFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/previewFragment"
-        android:name="com.robertlevonyan.demo.camerax.fragments.PreviewFragment"
-        android:label="fragment_preview"
-        tools:layout="@layout/fragment_preview" />
 </navigation>

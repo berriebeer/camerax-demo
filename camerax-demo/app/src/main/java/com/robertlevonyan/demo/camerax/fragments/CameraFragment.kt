@@ -454,7 +454,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         binding.sliderAlpha.trackTintList = ColorStateList.valueOf(color)
     }
     /**
-     * Navigate to PreviewFragment
+     * Navigate to GalleryActivity
      * */
     private fun openGallery() {
         if (getMedia().isEmpty()) return
@@ -655,7 +655,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         extensionsManagerFuture.addListener(
             {
                 val extensionsManager = extensionsManagerFuture.get() ?: return@addListener
-                val cameraProvider = cameraProvider ?: return@addListener
+                //TO DELETE val cameraProvider = cameraProvider ?: return@addListener
 
                 val isAvailable = extensionsManager.isExtensionAvailable(lensFacing, ExtensionMode.HDR)
 
@@ -690,7 +690,6 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
             LuminosityAnalyzer()
         )
     }
-
     private fun bindToLifecycle(localCameraProvider: ProcessCameraProvider, viewFinder: PreviewView) {
         try {
             localCameraProvider.bindToLifecycle(
@@ -846,7 +845,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>(R.layout.fragment_cam
         const val KEY_GRID = "sPrefGridCamera"
         const val KEY_HDR = "sPrefHDR"
 
-        private const val IMAGE_PICK_CODE = 1000
+        // TO DELETE private const val IMAGE_PICK_CODE = 1000
 
         private const val RATIO_4_3_VALUE = 4.0 / 3.0 // aspect ratio 4x3
         private const val RATIO_16_9_VALUE = 16.0 / 9.0 // aspect ratio 16x9

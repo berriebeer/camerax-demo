@@ -24,28 +24,10 @@ class MediaAdapter(
         holder.bind(getItem(position))
     }
 
-    fun shareImage(currentPage: Int, action: (Media) -> Unit) {
-        if (currentPage < itemCount) {
-            action(getItem(currentPage))
-        }
-    }
-
-    fun deleteImage(currentPage: Int) {
-        if (currentPage < itemCount) {
-            val media = getItem(currentPage)
-            val allMedia = currentList.toMutableList()
-            allMedia.removeAt(currentPage)
-            submitList(allMedia)
-            onDeleteClick(allMedia.size == 0, media.uri)
-        }
-    }
-
     inner class PicturesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val imagePreview: ImageView = itemView.findViewById(R.id.imagePreview)
-        private val imagePlay: ImageView = itemView.findViewById(R.id.imagePlay)
 
         fun bind(item: Media) {
-            imagePlay.visibility = if (item.isVideo) View.VISIBLE else View.GONE
             imagePreview.load(item.uri)
             imagePreview.setOnClickListener { onItemClick(item.isVideo, item.uri) }
         }
