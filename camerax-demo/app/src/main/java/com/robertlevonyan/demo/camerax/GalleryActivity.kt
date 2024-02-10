@@ -15,18 +15,31 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import java.io.File
 
 class GalleryActivity : AppCompatActivity() {
-    private lateinit var imageAdapter: ImageAdapter
-    private lateinit var imageUris: List<Uri>
+    private lateinit var imageAdapter: ImageAdapter // Declare at the class level
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gallery)
+
+        // Find the toolbar view inside the activity layout
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        // Sets the Toolbar to act as the ActionBar for this Activity window.
+        setSupportActionBar(toolbar)
+        // Show the Up button in the action bar.
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+
+        // Handle the back button action
+        toolbar.setNavigationOnClickListener {
+            onBackPressed() // Handle the back button event
+        }
 
 
         val recyclerView = findViewById<RecyclerView>(R.id.galleryRecyclerView)
@@ -88,8 +101,7 @@ class GalleryActivity : AppCompatActivity() {
     class ImageAdapter(
         private val images: ArrayList<Uri>,
         private val context: Context,
-        private val onImageClick: (Int) -> Unit
-    ) : RecyclerView.Adapter<ImageAdapter.ViewHolder>() {
+        private val onImageClick: (Int) -> Unit) : RecyclerView.Adapter<ImageAdapter.ViewHolder>() {
         private val space = context.resources.getDimensionPixelSize(R.dimen.image_spacing) // Assuming you have defined this in dimens.xml
         private val imageWidth = (context.resources.displayMetrics.widthPixels / 3) - (2 * space)
 
@@ -145,6 +157,11 @@ class GalleryActivity : AppCompatActivity() {
         newImageUris.reverse()
         // Update the adapter with the new list
         imageAdapter.updateData(newImageUris)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 
 }

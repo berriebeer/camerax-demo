@@ -1,9 +1,11 @@
 package com.robertlevonyan.demo.camerax
 
 import ImageSliderAdapter
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.robertlevonyan.demo.camerax.databinding.ActivityImageDetailBinding
@@ -49,11 +51,11 @@ class ImageDetailActivity : AppCompatActivity() {
                     true
                 }
                 R.id.share -> {
-                    // Handle show navigation
+                    shareCurrentImage()
                     true
                 }
                 R.id.delete -> {
-                    deleteCurrentImage()
+                    confirmAndDeleteCurrentImage()
                     true
                 }
                 else -> false
@@ -61,24 +63,45 @@ class ImageDetailActivity : AppCompatActivity() {
         }
 
     }
-    private fun deleteCurrentImage() {
+    private fun shareCurrentImage() {
         val currentUri = imageUris.getOrNull(currentPosition) ?: return
-        // Optionally, delete the image file from storage
-        deleteImageFromStorage(currentUri)
-
-        // Remove the URI from the list and notify the adapter
-        imageUris.removeAt(currentPosition)
-        (binding.viewPager2.adapter as? ImageSliderAdapter)?.notifyDataSetChanged()
-
-        // Optionally, close the activity if there are no more images
-        if (imageUris.isEmpty()) {
-            finish()
-        } else {
-            // Adjust the current position if needed
-            currentPosition = maxOf(0, currentPosition - 1)
-            binding.viewPager2.setCurrentItem(currentPosition, true)
+        val mimeType = contentResolver.getType(currentUri) ?: "image/*" // Fallback to a generic type if needed
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_STREAM, currentUri)
+            type = mimeType
+            // Optional: You can also add a subject or text to share along with the image
+            putExtra(Intent.EXTRA_TEXT, "Look at this photo I made with ThenAndNow Camera!")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) // Grant temporary read permission
         }
+        startActivity(Intent.createChooser(shareIntent, "Share Image"))
     }
+    private fun confirmAndDeleteCurrentImage() {
+        val currentUri = imageUris.getOrNull(currentPosition) ?: return
+
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.confirm_delete)) // Replace with your string resource for the title
+            .setMessage(getString(R.string.are_you_sure_delete)) // Replace with your string resource for the message
+            .setPositiveButton(getString(R.string.delete)) { dialog, which ->
+                // Proceed with the deletion
+                deleteImageFromStorage(currentUri)
+
+                // Remove the URI from the list and notify the adapter
+                imageUris.removeAt(currentPosition)
+                (binding.viewPager2.adapter as? ImageSliderAdapter)?.notifyDataSetChanged()
+
+                // Close the activity if there are no more images, or adjust the current position
+                if (imageUris.isEmpty()) {
+                    finish()
+                } else {
+                    currentPosition = maxOf(0, currentPosition - 1)
+                    binding.viewPager2.setCurrentItem(currentPosition, true)
+                }
+            }
+            .setNegativeButton(getString(R.string.cancel), null)
+            .show()
+    }
+
 
     private fun deleteImageFromStorage(uri: Uri) {
         // Implementation depends on how images are stored. Example for MediaStore:
