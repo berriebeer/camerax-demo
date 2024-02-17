@@ -5,16 +5,23 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.robertlevonyan.demo.camerax.databinding.ActivityImageDetailBinding
+import com.yalantis.ucrop.UCrop
+import java.io.File
 
 class ImageDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityImageDetailBinding
     private lateinit var imageUris: ArrayList<Uri>
     private var currentPosition: Int = 0
+
+    private lateinit var cropActivityResultLauncher: ActivityResultLauncher<Intent>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +46,18 @@ class ImageDetailActivity : AppCompatActivity() {
         binding.viewPager2.setCurrentItem(currentPosition, false)
 
 
+        cropActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK && result.data != null) {
+                val resultUri = UCrop.getOutput(result.data!!)
+                resultUri?.let {
+                    // Here you can update your UI with the cropped image URI
+                    Log.d("Cropped Image URI", it.toString())
+                    // Update your imageView or list with the new cropped image URI
+                    // For example: imageView.setImageURI(resultUri)
+                }
+            }
+        }
+
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -47,7 +66,15 @@ class ImageDetailActivity : AppCompatActivity() {
                     true
                 }
                 R.id.edit -> {
-                    // Handle animate navigation
+                    val sourceUri = imageUris[currentPosition] // Assuming you have a list of URIs and a currentPosition
+                    val destinationUri = Uri.fromFile(File(cacheDir, "Cropped_${System.currentTimeMillis()}.jpg"))
+
+                    val options = UCrop.Options().apply {
+                        // Customize uCrop options as needed
+                    }
+
+                    val uCrop = UCrop.of(sourceUri, destinationUri).withOptions(options)
+                    cropActivityResultLauncher.launch(uCrop.getIntent(this@ImageDetailActivity))
                     true
                 }
                 R.id.share -> {
@@ -76,6 +103,15 @@ class ImageDetailActivity : AppCompatActivity() {
         }
         startActivity(Intent.createChooser(shareIntent, "Share Image"))
     }
+
+    private fun deleteImageFromStorage(uri: Uri) {
+        // Implementation depends on how images are stored. Example for MediaStore:
+        try {
+            contentResolver.delete(uri, null, null)
+        } catch (e: Exception) {
+            Log.e("ImageDetailActivity", "Error deleting image", e)
+        }
+    }
     private fun confirmAndDeleteCurrentImage() {
         val currentUri = imageUris.getOrNull(currentPosition) ?: return
 
@@ -101,14 +137,5 @@ class ImageDetailActivity : AppCompatActivity() {
             .setNegativeButton(getString(R.string.cancel), null)
             .show()
     }
-
-
-    private fun deleteImageFromStorage(uri: Uri) {
-        // Implementation depends on how images are stored. Example for MediaStore:
-        try {
-            contentResolver.delete(uri, null, null)
-        } catch (e: Exception) {
-            Log.e("ImageDetailActivity", "Error deleting image", e)
-        }
-    }
 }
+
